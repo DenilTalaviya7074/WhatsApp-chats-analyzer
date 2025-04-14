@@ -37,9 +37,9 @@ if uploaded_file is not None:
     users_list.insert(0, 'Overall')
 
     selected_users = st.sidebar.selectbox("Select Users to Analyze", users_list)
-    analyze_button = st.sidebar.button("Analyze")
+    # analyze_button = st.sidebar.button("Analyze")
 
-    if analyze_button or st.session_state.df is not None:
+    if st.session_state.df is not None :
         # Display filtered dataframe
         if selected_users != 'Overall':
             df_filtered = df[df['user'] == selected_users]
@@ -51,24 +51,26 @@ if uploaded_file is not None:
         msg, words, media, link, urls = helper.fetch_stats(df, selected_users)
         st.session_state.urls = urls  # Store URLs in session state
         
+
         # Display stats
-        c1, c2, c3, c4 = st.columns(4)
-        with c1:
-            st.subheader("Total Messages")
-            st.success(msg)
-        with c2:
-            st.subheader("Total Words")
-            st.write(words)
-        with c3:
-            st.subheader("Total Media")
-            st.write(media)
-        with c4:
-            st.subheader("Total Links")
-            st.write(link)
-            
-            # Show Links button
-            if st.button("Show Links"):
-                st.session_state.show_links = not st.session_state.show_links
+        with st.container(border=True):
+            c1, c2, c3, c4 = st.columns(4)
+            with c1:
+                st.subheader("Total Messages")
+                st.title(msg)
+            with c2:
+                st.subheader("Total Words")
+                st.title(words)
+            with c3:
+                st.subheader("Total Media")
+                st.title(media)
+            with c4:
+                st.subheader("Total Links")
+                st.title(link)
+                
+                # Show Links button
+                if st.button("Show Links"):
+                    st.session_state.show_links = not st.session_state.show_links
         
         # Display links if button was clicked
         if st.session_state.show_links:
@@ -110,13 +112,13 @@ if uploaded_file is not None:
                 st.dataframe(per_df, width=700)
         
 
-        # # Word Cloud
-        # st.title("Word Cloud")
-        # wc_img = helper.create_wordcloud(df, selected_users)
-        # # plt.figure(figsize=(10, 10))
-        # fig, ax = plt.subplots()
-        # ax.imshow(wc_img)
-        # st.pyplot(fig)
+        # Word Cloud
+        st.title("Word Cloud")
+        wc_img = helper.create_wordcloud(df, selected_users)
+        # plt.figure(figsize=(10, 10))
+        fig, ax = plt.subplots()
+        ax.imshow(wc_img)
+        st.pyplot(fig)
 
         # Most Common Words
         st.title('Most Common Words')
@@ -127,6 +129,41 @@ if uploaded_file is not None:
         st.title('Emoji Analysis')
         emoji_df = helper.emoji_helper(df, selected_users)
         st.dataframe(emoji_df)
+
+        # Time Analysis
+        st.title('Time Analysis')
+        time_df = helper.timeline(df, selected_users)
+
+        # Convert columns to NumPy arrays for plotting
+        time = time_df['time'].to_numpy()
+        message_counts = time_df['message'].to_numpy()
+
+        # Plot the data
+        fig, ax = plt.subplots()
+        ax.plot(time, message_counts, marker='*', color='orange',)
+        plt.xticks(rotation='vertical')
+        plt.xlabel("Date")
+        plt.ylabel("Messages Count")
+        plt.title("Messages over Time")
+        st.pyplot(fig)
+
+        # Display the DataFrame
+        st.dataframe(time_df)
+
+        # Weekly Activity
+        st.title('Weekly Activity')
+        user_activity_df = helper.week_activity_map(df, selected_users)
+        # sort this df by day_name
+        days_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+        user_activity_df = user_activity_df.reindex(days_order)
+        fig, ax = plt.subplots()
+        ax.bar(user_activity_df.index, user_activity_df.values, color='red')
+        plt.xticks(rotation='vertical')
+        st.pyplot(fig)
+        
+        st.dataframe(user_activity_df)
+
+
 
 
 

@@ -12,7 +12,7 @@ def fetch_stats(df, selected_user):
 
     num_messages = df.shape[0]
     num_words = df['message'].str.split().apply(len).sum()
-    num_media = df[df['message'] == '<Media omitted>\n'].shape[0]
+    num_media = df[df['message'] == '<Media omitted>'].shape[0]
 
     ex = URLExtract()
     urls = []
@@ -96,3 +96,20 @@ def emoji_helper(df, selected_users):
         emojis.extend([c for c in word if emoji.is_emoji(c)])  # Check if the character is an emoji
 
     return pd.DataFrame(Counter(emojis).most_common(len(Counter(emojis))), columns=['Emoji', 'Count'])
+
+
+def timeline(df, selected_user):
+    if selected_user != 'Overall':
+        df = df[df['user'] == selected_user]
+
+    time = df.groupby(['year', 'month_num', 'month']).count()['message'].reset_index()
+    time['time'] = time['year'].astype(str) + '-' + time['month'].astype(str) 
+    # time['time'] = pd.to_datetime(time['time'])
+    return time
+
+
+def week_activity_map(df, selected_user):
+    if selected_user != 'Overall':
+        df = df[df['user'] == selected_user]
+
+    return df['day_name'].value_counts()
