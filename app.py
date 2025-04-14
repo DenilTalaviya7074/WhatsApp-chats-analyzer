@@ -110,13 +110,25 @@ if uploaded_file is not None:
                 st.dataframe(per_df, width=700)
         
 
-        # Word Cloud
-        st.title("Word Cloud")
-        wc_img = helper.create_wordcloud(df, selected_users)
-        # plt.figure(figsize=(10, 10))
-        fig, ax = plt.subplots()
-        ax.imshow(wc_img)
-        st.pyplot(fig)
+        # # Word Cloud
+        # st.title("Word Cloud")
+        # wc_img = helper.create_wordcloud(df, selected_users)
+        # # plt.figure(figsize=(10, 10))
+        # fig, ax = plt.subplots()
+        # ax.imshow(wc_img)
+        # st.pyplot(fig)
+
+        # Most Common Words
+        st.title('Most Common Words')
+        common_words_df = helper.most_common_words(df, selected_users)
+        st.dataframe(common_words_df)   
+
+        # Emoji Analysis
+        st.title('Emoji Analysis')
+        emoji_df = helper.emoji_helper(df, selected_users)
+        st.dataframe(emoji_df)
+
+
 
 # Add custom CSS for background image
 st.markdown(

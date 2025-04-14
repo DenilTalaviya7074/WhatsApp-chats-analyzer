@@ -1,6 +1,9 @@
 from wordcloud import WordCloud
+from collections import Counter
 import matplotlib.pyplot as plt
 from urlextract import URLExtract
+import pandas as pd
+import emoji
 
 def fetch_stats(df, selected_user):
 
@@ -38,8 +41,58 @@ def create_wordcloud(df, selected_users):
 
     if selected_users != 'Overall':
         df = df[df['user'] == selected_users]
+    
+        # Remove group notifications
+    temp = df[df['user'] != 'Group_Notification']
+    # remove <Media omitted> messages
+    temp = temp[temp['message'] != '<Media omitted>']
+    # remove empty messages
+    temp = temp[temp['message'].str.strip() != '']
 
     wc = WordCloud(width=500, height=500, background_color='white')
-    wc_image = wc.generate(df['message'].str.cat(sep=" "))
+    wc_image = wc.generate(temp['message'].str.cat(sep=" "))
 
     return wc_image
+
+
+
+
+
+def most_common_words(df, selected_users):
+    if selected_users != 'Overall':
+        df = df[df['user'] == selected_users]
+
+    # Remove group notifications
+    temp = df[df['user'] != 'Group_Notification']
+    # remove <Media omitted> messages
+    temp = temp[temp['message'] != '<Media omitted>']
+    # remove empty messages
+    temp = temp[temp['message'].str.strip() != '']
+    words = []
+
+    # remove stopwords of hinglish
+    # f = open('stop_hinglish.txt', 'r')
+    # stop_words = f.read()
+    # for message in temp['message']:
+    #     for word in message.lower().split():
+    #         if word not in stop_words:
+    #             words.append(word)
+    # cw = pd.DataFrame(Counter(words).most_common(20))
+
+    for message in temp['message']:
+        for word in message.lower().split():
+                words.append(word)
+    cw = pd.DataFrame(Counter(words).most_common(20),columns=['Word', 'Count'])
+
+    return cw
+
+
+
+def emoji_helper(df, selected_users):
+    if selected_users != 'Overall':
+        df = df[df['user'] == selected_users]
+    emojis = []
+    for word in df['message']:
+        emojis.extend([c for c in word if emoji.is_emoji(c)])  # Check if the character is an emoji
+
+    return pd.DataFrame(Counter(emojis).most_common(len(Counter(emojis))), columns=['Emoji', 'Count'])
