@@ -10,7 +10,6 @@ def preprocess(data):
     df = pd.DataFrame({'date': dates, 'msg': messages})
     
     # Clean and convert dates
-    df['date'] = df['date'].astype(str)
     df['date'] = df['date'].str.replace('\u202f', ' ', regex=False)
     df['date'] = df['date'].str.replace('\xa0', ' ', regex=False)
     df['date'] = df['date'].str.strip()
