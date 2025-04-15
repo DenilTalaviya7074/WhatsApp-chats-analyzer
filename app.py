@@ -12,10 +12,6 @@ if 'df' not in st.session_state:
     st.session_state.df = None
 if 'choice' not in st.session_state:
     st.session_state.choice = None
-# if 'device' not in st.session_state:
-#     st.session_state.device = None
-# if 'time_format' not in st.session_state:
-#     st.session_state.time_format = None
 if 'urls' not in st.session_state:
     st.session_state.urls = []
 if 'show_links' not in st.session_state:
