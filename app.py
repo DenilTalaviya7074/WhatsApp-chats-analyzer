@@ -136,12 +136,12 @@ if uploaded_file is not None :
             
 
             # Word Cloud
-            # st.title("Word Cloud")
-            # wc_img = helper.create_wordcloud(df, selected_users)
-            # # plt.figure(figsize=(10, 10))
-            # fig, ax = plt.subplots()
-            # ax.imshow(wc_img)
-            # st.pyplot(fig)
+            st.title("Word Cloud")
+            wc_img = helper.create_wordcloud(df, selected_users)
+            # plt.figure(figsize=(10, 10))
+            fig, ax = plt.subplots()
+            ax.imshow(wc_img)
+            st.pyplot(fig)
 
             # Most Common Words
             st.title('Most Common Words')
