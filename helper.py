@@ -5,6 +5,24 @@ from urlextract import URLExtract
 import pandas as pd
 import emoji
 
+
+# def fetch_format(choice,device, time_format):
+#     if choice == 'Android_12hour':
+#         device = 'Android'
+#         time_format = '12 hour'
+#     elif choice == 'Android_24hour':
+#         device = 'Android'
+#         time_format = '24 hour'
+#     elif choice == 'iOS_12hour':
+#         device = 'iOS'
+#         time_format = '12 hour'
+#     elif choice == 'iOS_24hour':
+#         device = 'iOS'
+#         time_format = '24 hour'
+#     else:
+
+
+
 def fetch_stats(df, selected_user):
 
     if selected_user != 'Overall':

@@ -1,19 +1,55 @@
 import re
 import pandas as pd
 
-def preprocess(data):
-    pattern = '\d{1,2}/\d{1,2}/\d{2},\s\d{1,2}:\d{2}\s[ap]m\s*-\s'
+def preprocess(data, device, time_format):
+
+    if device == 'Android':
+        if time_format == '12 hour':
+            pattern = '\d{1,2}/\d{1,2}/\d{2},\s\d{1,2}:\d{2}\s[ap]m\s*-\s' # android
+        elif time_format == '24 hour':
+            pattern = '\d{1,2}/\d{1,2}/\d{2},\s\d{1,2}:\d{2}\s*-\s' # android
+    elif device == 'iOS':
+        if time_format == '12 hour':
+            pattern = '\[\d{1,2}/\d{1,2}/\d{2},\s\d{1,2}:\d{2}:\d{2}\s[AP]M\]\s*' # ios
+        elif time_format == '24 hour':
+            pattern = '\[\d{1,2}/\d{1,2}/\d{2,4},\s\d{1,2}:\d{2}:\d{2}\]\s*' # ios
+
+    # pattern12 = '\d{1,2}/\d{1,2}/\d{2},\s\d{1,2}:\d{2}\s[ap]m\s*-\s' # android
+    # pattern24 = '\d{1,2}/\d{1,2}/\d{2},\s\d{1,2}:\d{2}\s*-\s' # android
+    # pattern12 = '\[\d{1,2}/\d{1,2}/\d{2},\s\d{1,2}:\d{2}:\d{2}\s[AP]M\]\s*' # ios
+    # pattern24 = "\[\d{1,2}/\d{1,2}/\d{2,4},\s\d{1,2}:\d{2}:\d{2}\]\s*" # ios
+
     messages = re.split(pattern, data)[1:]
     dates = re.findall(pattern, data)
     
     # Create DataFrame
-    df = pd.DataFrame({'date': dates, 'msg': messages})
     
+    if device == 'iOS':
+        # For iOS, remove brackets and extra spaces
+        dates = [date.strip('[] ') for date in dates]
+    df = pd.DataFrame({'date': dates, 'msg': messages})
     # Clean and convert dates
+    df['date'] = df['date'].str.replace('AM', 'am', regex=False)
+    df['date'] = df['date'].str.replace('PM', 'pm', regex=False)
     df['date'] = df['date'].str.replace('\u202f', ' ', regex=False)
+    df['date'] = df['date'].str.replace('\u202e', ' ', regex=False)
     df['date'] = df['date'].str.replace('\xa0', ' ', regex=False)
     df['date'] = df['date'].str.strip()
-    df['date'] = pd.to_datetime(df['date'], format='%d/%m/%y, %I:%M %p -', errors='coerce')
+
+
+    #for 12
+    # df['date'] = df['date'].str.replace('AM', 'am', regex=False)
+    # df['date'] = df['date'].str.replace('PM', 'pm', regex=False)
+
+    if device == 'Android' and time_format == '12 hour':
+        df['date'] = pd.to_datetime(df['date'], format='%d/%m/%y, %I:%M %p -', errors='coerce')
+    elif device == 'Android' and time_format == '24 hour':
+        df['date'] = pd.to_datetime(df['date'], format='%d/%m/%y, %H:%M -', errors='coerce')
+    elif device == 'iOS' and time_format == '12 hour':
+        df['date'] = pd.to_datetime(df['date'], format='%d/%m/%y, %I:%M:%S %p', errors='coerce', dayfirst=True)
+    elif device == 'iOS' and time_format == '24 hour':
+        df['date'] = pd.to_datetime(df['date'], format='%d/%m/%y, %H:%M:%S', errors='coerce', dayfirst=True)
+    
     
     # Process users and messages
     users = []
