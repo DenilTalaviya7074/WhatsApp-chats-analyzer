@@ -40,7 +40,7 @@ def preprocess(data, device, time_format):
     # format = '%Y'-> 2025   and '%y' -> 25  to do this first check txt data
 
     if device == 'Android' and time_format == '12 hour':
-        df['date'] = pd.to_datetime(df['date'], format='%d/%m/%Y, %I:%M %p -', errors='coerce') 
+        df['date'] = pd.to_datetime(df['date'], format='%d/%m/%y, %I:%M %p -', errors='coerce') 
     elif device == 'Android' and time_format == '24 hour':
         df['date'] = pd.to_datetime(df['date'], format='%d/%m/%Y, %H:%M -', errors='coerce')
     elif device == 'iOS' and time_format == '12 hour':
